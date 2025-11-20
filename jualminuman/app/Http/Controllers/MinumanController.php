@@ -25,10 +25,17 @@ class MinumanController extends Controller
     {
         $request->validate([
             'nama'        => 'required|string|max:255',
-            'stok'        => 'required|integer',
+            'stok'        => 'required|integer|min:0|max:1000',
             'gambar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'kategori_id' => 'required|exists:kategoriminuman,id',
         ]);
+
+        // Jika stok melebihi 1000, kembalikan error manual
+        if ($request->stok > 1000) {
+            return response()->json([
+                'message' => 'Stok tidak boleh lebih dari 1000'
+            ], 400);
+        }
 
         // Upload gambar jika ada
         $gambarPath = null;
@@ -67,10 +74,17 @@ class MinumanController extends Controller
 
         $request->validate([
             'nama'        => 'sometimes|required|string|max:255',
-            'stok'        => 'sometimes|required|integer',
+            'stok'        => 'sometimes|required|integer|min:0|max:1000',
             'gambar'      => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
             'kategori_id' => 'sometimes|required|exists:kategoriminuman,id',
         ]);
+
+        // Jika stok melebihi 1000, kembalikan error manual
+        if ($request->has('stok') && $request->stok > 1000) {
+            return response()->json([
+                'message' => 'Stok tidak boleh lebih dari 1000'
+            ], 400);
+        }
 
         // Jika ada gambar baru, hapus gambar lama dan upload baru
         if ($request->hasFile('gambar')) {
